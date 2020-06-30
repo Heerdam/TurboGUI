@@ -11,7 +11,7 @@ void TurboGUI::GUI::init() {
 
 void TurboGUI::GUI::draw() {
 
-
+/*
 	auto draw_data = ImGui::GetDrawData();
 
     ImVec2 clip_off = draw_data->DisplayPos;         // (0,0) unless using multi-viewports
@@ -23,8 +23,8 @@ void TurboGUI::GUI::draw() {
     for (uint n = 0; n < draw_data->CmdListsCount; n++) {
         const ImDrawList* cmd_list = draw_data->CmdLists[n];
 
-        std::memcpy(VBO_ptr[currIndex], cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.Size * (uint)sizeof(ImDrawVert));
-        std::memcpy(EBO_ptr[currIndex], cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.Size * (uint)sizeof(ImDrawVert));
+        //std::memcpy(VBO_ptr[currIndex], cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.Size * (uint)sizeof(ImDrawVert));
+        //std::memcpy(EBO_ptr[currIndex], cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.Size * (uint)sizeof(ImDrawVert));
 
         for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++) {
             const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
@@ -74,5 +74,6 @@ void TurboGUI::GUI::draw() {
 
         }
     }
+    */
 
 }
