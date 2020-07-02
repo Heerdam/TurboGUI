@@ -2,7 +2,11 @@
 #include "glad/glad.h"
 
 #include <vector>
+#include <utility>
+#include <exception>
+#include <string>
 
 namespace TurboGUI {
 	typedef unsigned int uint;
+	typedef unsigned short ushort;
 }
