@@ -1,8 +1,6 @@
 
 #include "../public/gui.h"
 
-#include "../public/imgui.h"
-
 void TurboGUI::GUI::initIMGUI() {
     context = ImGui::CreateContext();
 }
@@ -106,7 +104,7 @@ void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
         GLuint frag = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(frag, 1, &fragment_shader, nullptr);
         glCompileShader(frag);
-        GLint isCompiled = 0;
+        isCompiled = 0;
         glGetShaderiv(frag, GL_COMPILE_STATUS, &isCompiled);
         if (isCompiled == GL_FALSE) {
             GLint maxLength = 0;
@@ -139,6 +137,10 @@ void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
 
         glDetachShader(shader, vertex);
         glDetachShader(shader, frag);
+    }
+    {
+        //syncObj[0] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+        syncObj[1] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     }
 }
 
@@ -192,6 +194,9 @@ void TurboGUI::GUI::draw() {
         glUseProgram(shader);
         glBindVertexArray(currIndex);
 
+        uint fb_width = draw_data->DisplaySize.x;
+        uint fb_height = draw_data->DisplaySize.y;
+
         glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
         const float L = draw_data->DisplayPos.x;
         const float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
@@ -231,8 +236,9 @@ void TurboGUI::GUI::draw() {
 }
 
 void TurboGUI::GUI::sync() {
-    glClientWaitSync(syncObj[currIndex], GL_SYNC_FLUSH_COMMANDS_BIT, 5e6);
-    glDeleteSync(syncObj[currIndex]);
+    uint syncI = (++currIndex) % 2;
+    glClientWaitSync(syncObj[syncI], GL_SYNC_FLUSH_COMMANDS_BIT, 5e6);
+    glDeleteSync(syncObj[syncI]);
     syncObj[currIndex] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-    currIndex = (++currIndex) % 2;
+    currIndex = syncI;
 }

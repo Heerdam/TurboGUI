@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "defines.h"
 
 namespace TurboGUI {
@@ -25,8 +27,6 @@ namespace TurboGUI {
 		GLsync syncObj[2];
 
 		uint currIndex = 0;
-
-		float fb_width, fb_height;
 
 		ImGuiContext* context;
 

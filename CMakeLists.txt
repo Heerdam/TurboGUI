@@ -14,10 +14,9 @@ else()
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -DNDEBUG -flto")
 endif()
 
-
 include(FetchContent)
 
-add_executable(turbogui 
+SET(HEADER
 	src/public/imstb_truetype.h
 	src/public/imstb_textedit.h
 	src/public/imstb_rectpack.h
@@ -26,13 +25,18 @@ add_executable(turbogui
 	src/public/imconfig.h
 	src/public/gui.h
 	src/public/defines.h
+)
 
+add_library(turbogui STATIC
+	"${HEADER}"
 	src/private/imgui.cpp
 	src/private/imgui_demo.cpp
 	src/private/imgui_draw.cpp
 	src/private/imgui_widgets.cpp
 	src/private/gui.cpp
 )
+
+set_target_properties(turbogui PROPERTIES VERSION 0.1)
 
 # ------------------ GLAD ------------------
 find_package (glad 0.1.33 QUIET)
@@ -56,3 +60,6 @@ endif()
 target_link_libraries(turbogui
 	glad
 )
+
+install(TARGETS turbogui DESTINATION lib)
+install(FILES "${HEADER}" DESTINATION include)
