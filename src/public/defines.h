@@ -5,6 +5,7 @@
 #include <utility>
 #include <exception>
 #include <string>
+#include <iostream>
 
 #include "../public/imgui.h"
 

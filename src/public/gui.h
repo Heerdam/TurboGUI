@@ -39,9 +39,6 @@ namespace TurboGUI {
 		void begin();
 		void draw();
 		void sync();
-
-		
-
 	};
 
 

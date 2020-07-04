@@ -16,27 +16,11 @@ endif()
 
 include(FetchContent)
 
-SET(HEADER
-	../src/public/imstb_truetype.h
-	../src/public/imstb_textedit.h
-	../src/public/imstb_rectpack.h
-	../src/public/imgui_internal.h
-	../src/public/imgui.h
-	../src/public/imconfig.h
-	../src/public/gui.h
-	../src/public/defines.h
-)
-
 add_executable(tbgex
-	"${HEADER}"
-	../src/private/imgui.cpp
-	../src/private/imgui_demo.cpp
-	../src/private/imgui_draw.cpp
-	../src/private/imgui_widgets.cpp
-	../src/private/gui.cpp
-
 	src/main.cpp
 )
+# ------------------ TURBOGUI ------------------
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/.." tbg)
 
 # ------------------ GLFW ------------------
 find_package (glfw3 3.3.2 QUIET)
@@ -62,27 +46,8 @@ else()
 	endif()
 endif()
 
-# ------------------ GLAD ------------------
-find_package (glad 0.1.33 QUIET)
-if(glad_FOUND)
-	message(STATUS "GLAD found!")
-else()
-	message(STATUS "GLAD not found! Fetching...")
-	set(GLAD_API "gl=4.6" CACHE STRING "API type/version pairs, like \"gl=4.6,gles=\", no version means latest")
-	FetchContent_Declare(
-		glad
-		GIT_REPOSITORY https://github.com/Dav1dde/glad.git
-		GIT_TAG        v0.1.33
-	)
-	FetchContent_GetProperties(glad)
-	if(NOT glad_POPULATED)
-		FetchContent_Populate(glad)
-		add_subdirectory("${glad_SOURCE_DIR}" "${glad_BINARY_DIR}")
-	endif()
-endif()
-
 target_link_libraries(tbgex
-	glad
 	glfw
+	turbogui
 )
 

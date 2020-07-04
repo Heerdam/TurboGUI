@@ -1,8 +1,14 @@
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <gui.h>
 
-#include "../../src/public/gui.h"
+void GLAPIENTRY MessageCallback(GLenum /*source*/, GLenum type, GLuint /*id*/, GLenum severity, GLsizei /*length*/, const GLchar* message, const void* /*userParam*/) {
+	if (type != GL_DEBUG_TYPE_ERROR) return;
+	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+		type, severity, message);
+}
 
 static bool g_MouseJustPressed[ImGuiMouseButton_COUNT] = {};
 
@@ -48,6 +54,34 @@ void ImGui_ImplGlfw_CharCallback(GLFWwindow* window, unsigned int c) {
 	io.AddInputCharacter(c);
 }
 
+static void ImGui_ImplGlfw_UpdateMousePosAndButtons(GLFWwindow* _window) {
+	// Update buttons
+	ImGuiIO& io = ImGui::GetIO();
+	for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++) {
+		// If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
+		io.MouseDown[i] = g_MouseJustPressed[i] || glfwGetMouseButton(_window, i) != 0;
+		g_MouseJustPressed[i] = false;
+	}
+
+	// Update mouse position
+	const ImVec2 mouse_pos_backup = io.MousePos;
+	io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
+#ifdef __EMSCRIPTEN__
+	const bool focused = true; // Emscripten
+#else
+	const bool focused = glfwGetWindowAttrib(_window, GLFW_FOCUSED) != 0;
+#endif
+	if (focused) {
+		if (io.WantSetMousePos) {
+			glfwSetCursorPos(_window, (double)mouse_pos_backup.x, (double)mouse_pos_backup.y);
+		} else {
+			double mouse_x, mouse_y;
+			glfwGetCursorPos(_window, &mouse_x, &mouse_y);
+			io.MousePos = ImVec2((float)mouse_x, (float)mouse_y);
+		}
+	}
+}
+
 int main() {
 
 	if (!glfwInit()) {
@@ -64,7 +98,7 @@ int main() {
 	glfwWindowHint(GLFW_DEPTH_BITS, 24);
 	glfwWindowHint(GLFW_STENCIL_BITS, 8);
 
-	const float width = 1980.f;
+	const float width = 1920.f;
 	const float height = 1080.f;
 
 	GLFWwindow* window = glfwCreateWindow(width, height, "TurboGUI Example 0.1a", NULL, NULL);
@@ -79,15 +113,16 @@ int main() {
 		return -1;
 	}
 
+	glDebugMessageCallback(MessageCallback, 0);
+
 	glfwSwapInterval(0);
 
 	TurboGUI::GUI gui;
 	gui.initIMGUI();
 	//Fonts
 	{
-		ImGuiIO& io = ImGui::GetIO();
-		ImGui::StyleColorsDark();
-		io.Fonts->AddFontDefault();
+		
+		
 	}
 	//Inputs
 	{
@@ -126,24 +161,42 @@ int main() {
 		glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 	}
 
-	gui.begin();
-	ImGui::ShowDemoWindow();
-	unsigned int vbo_upper_bound, ebo_upper_bound;
-	gui.findUpperBound(vbo_upper_bound, ebo_upper_bound);
-	gui.initGL((unsigned int)(vbo_upper_bound * 1.25f), (unsigned int)(ebo_upper_bound * 1.25f));
+	//gui.begin();
+	//ImGui::ShowDemoWindow();
+	//unsigned int vbo_upper_bound, ebo_upper_bound;
+	//gui.findUpperBound(vbo_upper_bound, ebo_upper_bound);
+	gui.initGL((unsigned int)(100000), (unsigned int)(200000));
 
 	bool show_demo_window = true;
+
+	double time = glfwGetTime();
+	unsigned long long frame = 0;
 	while (!glfwWindowShouldClose(window)) {
 
+		double ctime = glfwGetTime();
+
+		glClearColor(0.f, 0.f, 0.4f, 1.f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 		glfwPollEvents();
+		ImGui_ImplGlfw_UpdateMousePosAndButtons(window);
 
 		gui.begin();
 		if (show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window);
+
 		gui.draw();
 		gui.sync();
 
 		glfwSwapBuffers(window);
+
+		frame++;
+		if (ctime - time >= 1.0) {
+			std::cout << frame << std::endl;
+			frame = 0;
+			time = ctime;
+			
+		}
 	}
 	glfwTerminate();
 	return 0;

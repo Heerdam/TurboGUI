@@ -36,6 +36,7 @@ add_library(turbogui STATIC
 	src/private/gui.cpp
 )
 
+target_include_directories(turbogui PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/public)
 set_target_properties(turbogui PROPERTIES VERSION 0.1)
 
 # ------------------ GLAD ------------------
@@ -57,9 +58,6 @@ else()
 	endif()
 endif()
 
-target_link_libraries(turbogui
+target_link_libraries(turbogui PUBLIC
 	glad
 )
-
-install(TARGETS turbogui DESTINATION lib)
-install(FILES "${HEADER}" DESTINATION include)
