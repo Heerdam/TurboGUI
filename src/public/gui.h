@@ -14,7 +14,6 @@ namespace TurboGUI {
 		}
 	};
 
-	//template<class T>
 	class GUI {
 
 		GLuint VAO[2], VBO[2], EBO[2];
@@ -28,17 +27,29 @@ namespace TurboGUI {
 
 		uint currIndex = 0;
 
+		std::chrono::high_resolution_clock::time_point time;
+		float drawTime = 0.f; //ms
+		std::vector<float> drawTimeMean = std::vector<float>(100);
+		uint drawMeanTimeIndex = 0;
+		float meanTime = 0.f;
+
+		uint idxBound, vertBound;
+		uint maxIdx = 0, maxVert = 0;
+		uint idx, vert;
+		uint maxFps = 0;
+
 		ImGuiContext* context;
 
 	public:
 		/* set up ImGui fonts and style after calling this */
 		void initIMGUI();
-		void findUpperBound(uint&, uint&);
 		void initGL(uint, uint);
 		/* use ImGui::GetIO() to set up mouse and keyboard inputs before calling this */
 		void begin();
 		void draw();
 		void sync();
+
+		void drawStats(uint);
 	};
 
 

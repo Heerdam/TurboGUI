@@ -9,44 +9,28 @@ void TurboGUI::GUI::initIMGUI() {
     io.Fonts->AddFontDefault();
     io.DisplaySize = ImVec2(1920, 1080);
 
+    std::memset(drawTimeMean.data(), 0.f, drawTimeMean.size() * sizeof(float));
+
     {
         ImGuiIO& io = ImGui::GetIO();
         unsigned char* pixels;
         int width, height;
         io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-  
-       // glGetIntegerv(GL_TEXTURE_BINDING_2D, &tex);
+
         glGenTextures(1, &tex);
         glBindTexture(GL_TEXTURE_2D, tex);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        //glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     }
 }
 
-void TurboGUI::GUI::findUpperBound(uint& _vbo_upper_bound, uint& _ebo_upper_bound) {
-
-    ImGui::Render();
-
-    auto draw_data = ImGui::GetDrawData();
-
-    uint idx_offset = 0;
-    uint v_offset = 0;
-
-    for (uint n = 0; n < draw_data->CmdListsCount; n++) {
-        const ImDrawList* cmd_list = draw_data->CmdLists[n];
-        v_offset += cmd_list->VtxBuffer.Size;
-        idx_offset += cmd_list->IdxBuffer.Size;
-    }
-
-    _vbo_upper_bound = v_offset;
-    _ebo_upper_bound = idx_offset;
-
-    std::cout << _vbo_upper_bound << " " << _ebo_upper_bound << std::endl;
-}
-
 void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
+
+    idxBound = _ebo_upper_bound;
+    vertBound = _vbo_upper_bound;
+
     //map buffers
     glGenVertexArrays(2, VAO);
 
@@ -58,8 +42,8 @@ void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
 
         //vbo
         glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
-        glBufferStorage(GL_ARRAY_BUFFER, _vbo_upper_bound * (uint)sizeof(ImDrawVert), nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_CLIENT_STORAGE_BIT | GL_MAP_COHERENT_BIT);
-        VBO_ptr[i] = reinterpret_cast<float*>(glMapBufferRange(GL_ARRAY_BUFFER, 0, _vbo_upper_bound * (uint)sizeof(ImDrawVert), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT));
+        glBufferStorage(GL_ARRAY_BUFFER, _vbo_upper_bound * (uint)sizeof(ImDrawVert), nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_CLIENT_STORAGE_BIT);
+        VBO_ptr[i] = reinterpret_cast<float*>(glMapBufferRange(GL_ARRAY_BUFFER, 0, _vbo_upper_bound * (uint)sizeof(ImDrawVert), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_UNSYNCHRONIZED_BIT));
 
         //pos
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, pos));
@@ -75,8 +59,8 @@ void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
 
         //ebo
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[i]);
-        glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, _ebo_upper_bound * (uint)sizeof(ImDrawIdx), nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_CLIENT_STORAGE_BIT | GL_MAP_COHERENT_BIT);
-        EBO_ptr[i] = reinterpret_cast<ushort*>(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, _ebo_upper_bound * (uint)sizeof(ImDrawIdx), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT));
+        glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, _ebo_upper_bound * (uint)sizeof(ImDrawIdx), nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_CLIENT_STORAGE_BIT);
+        EBO_ptr[i] = reinterpret_cast<ushort*>(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, _ebo_upper_bound * (uint)sizeof(ImDrawIdx), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_UNSYNCHRONIZED_BIT));
 
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -85,7 +69,7 @@ void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
 
     {
         const GLchar* vertex_shader =
-            "#version 460 core\n"
+            "#version 430 core\n"
             "layout (location = 0) in vec2 Position;\n"
             "layout (location = 1) in vec2 UV;\n"
             "layout (location = 2) in vec4 Color;\n"
@@ -100,7 +84,7 @@ void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
             "}\n";
 
         const GLchar* fragment_shader =
-            "#version 460 core\n"
+            "#version 430 core\n"
             "in vec2 Frag_UV;\n"
             "in vec4 Frag_Color;\n"
             "layout (location = 4) uniform sampler2D Texture;\n"
@@ -168,11 +152,13 @@ void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
         //syncObj[0] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
         syncObj[1] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     }
+ 
 }
 
 void TurboGUI::GUI::begin() {
+    time = std::chrono::high_resolution_clock::now();
     ImGui::SetCurrentContext(context);
-    ImGui::NewFrame();
+    ImGui::NewFrame();   
 }
 
 void TurboGUI::GUI::draw() {
@@ -192,9 +178,7 @@ void TurboGUI::GUI::draw() {
         uint old_i_offset = 0;
         uint idx_offset = 0;
         uint v_offset = 0;
-        //std::cout << "cc: " << draw_data->CmdListsCount;
 
-        //std::cout << " cmd: ";
         for (uint n = 0; n < draw_data->CmdListsCount; n++) {
             const ImDrawList* cmd_list = draw_data->CmdLists[n];
             std::memcpy(VBO_ptr[currIndex] + v_offset*5, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.Size * (uint)sizeof(ImDrawVert));
@@ -203,7 +187,6 @@ void TurboGUI::GUI::draw() {
             v_offset += cmd_list->VtxBuffer.Size;
             idx_offset += cmd_list->IdxBuffer.Size;
 
-            //std::cout << "[" << cmd_list->CmdBuffer.Size << " offset: " << old_v_offset << " " << old_i_offset << "] ";
             for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++) {
                 auto cmd = &cmd_list->CmdBuffer[cmd_i];
                 cmdCache.push_back({ cmd, old_v_offset, old_i_offset });
@@ -212,8 +195,11 @@ void TurboGUI::GUI::draw() {
             old_i_offset = idx_offset;
         }
 
-        //std::cout << " v:" << v_offset << " i:" << idx_offset << std::endl << std::endl;
+        idx = idx_offset;
+        vert = v_offset;
 
+        maxIdx = std::max(idx, maxIdx);
+        maxVert = std::max(vert, maxVert);
     }
 
     //draw
@@ -281,7 +267,15 @@ void TurboGUI::GUI::draw() {
 
         glScissor(0, 0, (GLsizei)draw_data->DisplaySize.x, (GLsizei)draw_data->DisplaySize.y);
     }
-
+    {
+        auto deltaT = std::chrono::high_resolution_clock::now() - time;
+        long long ns = deltaT.count();
+        drawTime = 1.f / 1e6 * ns;
+        drawMeanTimeIndex = (++drawMeanTimeIndex) % drawTimeMean.size();
+        drawTimeMean[drawMeanTimeIndex] = drawTime;
+        meanTime = std::accumulate(drawTimeMean.begin(), drawTimeMean.end(), 0.f);
+        meanTime /= drawTimeMean.size();
+    }
 }
 
 void TurboGUI::GUI::sync() {
@@ -290,4 +284,24 @@ void TurboGUI::GUI::sync() {
     glDeleteSync(syncObj[syncI]);
     syncObj[currIndex] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     currIndex = syncI;
+}
+
+void TurboGUI::GUI::drawStats(uint _fps) {
+    maxFps = std::max(maxFps, _fps);
+    bool open = true;
+
+    ImGui::Begin("TurboGUI stats", &open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize
+        | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::SetWindowFontScale(1.75f);
+
+    //fps
+    ImGui::Text("fps: %i [%i]", _fps, maxFps);
+    //draw time
+    ImGui::Text("draw time: %.3fms [%.3fms]", drawTime, meanTime);
+    //vertices
+    ImGui::Text("v: %i [%i] [%i]", vert, maxVert, vertBound);
+    //indices
+    ImGui::Text("i: %i [%i] [%i]", idx, maxIdx, idxBound);
+    
+    ImGui::End();
 }

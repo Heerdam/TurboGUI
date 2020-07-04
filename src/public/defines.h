@@ -6,6 +6,9 @@
 #include <exception>
 #include <string>
 #include <iostream>
+#include <chrono>
+#include <algorithm>
+#include <numeric>
 
 #include "../public/imgui.h"
 

@@ -45,7 +45,7 @@ if(glad_FOUND)
 	message(STATUS "GLAD found!")
 else()
 	message(STATUS "GLAD not found! Fetching...")
-	set(GLAD_API "gl=4.6" CACHE STRING "API type/version pairs, like \"gl=4.6,gles=\", no version means latest")
+	set(GLAD_API "gl=4.3" CACHE STRING "API type/version pairs, like \"gl=4.3,gles=\", no version means latest")
 	FetchContent_Declare(
 		glad
 		GIT_REPOSITORY https://github.com/Dav1dde/glad.git

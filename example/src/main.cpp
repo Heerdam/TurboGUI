@@ -161,16 +161,12 @@ int main() {
 		glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 	}
 
-	//gui.begin();
-	//ImGui::ShowDemoWindow();
-	//unsigned int vbo_upper_bound, ebo_upper_bound;
-	//gui.findUpperBound(vbo_upper_bound, ebo_upper_bound);
 	gui.initGL((unsigned int)(100000), (unsigned int)(200000));
 
 	bool show_demo_window = true;
 
 	double time = glfwGetTime();
-	unsigned long long frame = 0;
+	unsigned int frame = 0, fps = 0;
 	while (!glfwWindowShouldClose(window)) {
 
 		double ctime = glfwGetTime();
@@ -185,6 +181,8 @@ int main() {
 		if (show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window);
 
+		gui.drawStats(fps);
+
 		gui.draw();
 		gui.sync();
 
@@ -192,7 +190,7 @@ int main() {
 
 		frame++;
 		if (ctime - time >= 1.0) {
-			std::cout << frame << std::endl;
+			fps = frame;
 			frame = 0;
 			time = ctime;
 			
