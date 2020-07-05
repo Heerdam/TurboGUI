@@ -119,7 +119,6 @@ int main() {
 		return 0;
 	}
 
-
 	glDebugMessageCallback(MessageCallback, 0);
 
 	glfwSwapInterval(0);

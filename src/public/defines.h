@@ -9,6 +9,7 @@
 #include <chrono>
 #include <algorithm>
 #include <numeric>
+#include <cstring>
 
 #include "../public/imgui.h"
 
