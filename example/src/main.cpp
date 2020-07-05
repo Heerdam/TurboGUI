@@ -91,9 +91,10 @@ int main() {
 	glfwWindowHint(GLFW_REFRESH_RATE, 144);
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
 	glfwWindowHint(GLFW_DEPTH_BITS, 24);
 	glfwWindowHint(GLFW_STENCIL_BITS, 8);
@@ -112,6 +113,12 @@ int main() {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		return -1;
 	}
+
+	if (glfwExtensionSupported("GL_ARB_buffer_storage") == GLFW_FALSE) {
+		std::cout << "extension GL_ARB_buffer_storage not supported" << std::endl;
+		return 0;
+	}
+
 
 	glDebugMessageCallback(MessageCallback, 0);
 
