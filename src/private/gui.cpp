@@ -1,6 +1,6 @@
 
 #include "../public/gui.h"
-
+#include <cstring>
 void TurboGUI::GUI::initIMGUI() {
     context = ImGui::CreateContext();
 

@@ -61,4 +61,5 @@ endif()
 
 target_link_libraries(turbogui PUBLIC
 	glad
+	dl
 )

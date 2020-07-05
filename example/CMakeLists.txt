@@ -49,5 +49,6 @@ endif()
 target_link_libraries(tbgex
 	glfw
 	turbogui
+	glad
+	dl
 )
-
