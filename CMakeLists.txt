@@ -59,6 +59,17 @@ else()
 	endif()
 endif()
 
-target_link_libraries(turbogui PUBLIC
-	glad
-)
+if(POLICY CMP0079)
+  cmake_policy(SET CMP0079 NEW)
+endif()
+
+if (MSVC)
+	target_link_libraries(turbogui PUBLIC
+		glad
+	)
+else()
+	target_link_libraries(turbogui PUBLIC
+		glad
+		dl
+	)
+endif()
