@@ -59,10 +59,6 @@ else()
 	endif()
 endif()
 
-if(POLICY CMP0079)
-  cmake_policy(SET CMP0079 NEW)
-endif()
-
 if (MSVC)
 	target_link_libraries(turbogui PUBLIC
 		glad
