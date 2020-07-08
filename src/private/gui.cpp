@@ -1,13 +1,16 @@
 
 #include "../public/gui.h"
+void TurboGUI::GUI::initIMGUI(uint resolutionX, uint resolutionY){
+    TurboGUI::GUI::initIMGUI(ImVec2(resolutionX, resolutionY));
+}
 
-void TurboGUI::GUI::initIMGUI() {
+void TurboGUI::GUI::initIMGUI(const ImVec2& resolution) {
     context = ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
     ImGui::StyleColorsDark();
     io.Fonts->AddFontDefault();
-    io.DisplaySize = ImVec2(1920, 1080);
+    io.DisplaySize = resolution;
 
     std::memset(drawTimeMean.data(), 0.f, drawTimeMean.size() * sizeof(float));
 
