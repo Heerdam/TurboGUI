@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "defines.h"
+#include "tb_defines.h"
 
 namespace TurboGUI {
 
@@ -41,8 +41,7 @@ namespace TurboGUI {
 		ImGuiContext* context;
 
 	public:
-		/* set up ImGui fonts and style after calling this */
-		void initIMGUI();
+		GUI() { context = ImGui::CreateContext(); }
 		void initGL(uint, uint);
 		/* use ImGui::GetIO() to set up mouse and keyboard inputs before calling this */
 		void begin();

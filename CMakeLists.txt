@@ -23,8 +23,8 @@ SET(HEADER
 	src/public/imgui_internal.h
 	src/public/imgui.h
 	src/public/imconfig.h
-	src/public/gui.h
-	src/public/defines.h
+	src/public/tb_gui.h
+	src/public/tb_defines.h
 )
 
 add_library(turbogui STATIC
@@ -33,7 +33,7 @@ add_library(turbogui STATIC
 	src/private/imgui_demo.cpp
 	src/private/imgui_draw.cpp
 	src/private/imgui_widgets.cpp
-	src/private/gui.cpp
+	src/private/tb_gui.cpp
 )
 
 target_include_directories(turbogui PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/public)

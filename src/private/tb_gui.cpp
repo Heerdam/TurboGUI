@@ -1,14 +1,8 @@
 
-#include "../public/gui.h"
+#include "../public/tb_gui.h"
 
-void TurboGUI::GUI::initIMGUI() {
-    context = ImGui::CreateContext();
-
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::StyleColorsDark();
-    io.Fonts->AddFontDefault();
-    io.DisplaySize = ImVec2(1920, 1080);
-
+void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
+ 
     std::memset(drawTimeMean.data(), 0.f, drawTimeMean.size() * sizeof(float));
 
     {
@@ -24,9 +18,6 @@ void TurboGUI::GUI::initIMGUI() {
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     }
-}
-
-void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
 
     idxBound = _ebo_upper_bound;
     vertBound = _vbo_upper_bound;
