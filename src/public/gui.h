@@ -42,7 +42,8 @@ namespace TurboGUI {
 
 	public:
 		/* set up ImGui fonts and style after calling this */
-		void initIMGUI();
+		void initIMGUI(const ImVec2& resolution);
+		void initIMGUI(uint resolutionX, uint resolutionY);
 		void initGL(uint, uint);
 		/* use ImGui::GetIO() to set up mouse and keyboard inputs before calling this */
 		void begin();
