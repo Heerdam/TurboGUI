@@ -37,19 +37,37 @@ namespace TurboGUI {
 		uint maxIdx = 0, maxVert = 0;
 		uint idx, vert;
 		uint maxFps = 0;
+		uint timeOutSync = 5e6;
+		uint syncTime = 0;
 
 		ImGuiContext* context;
 
 	public:
 		GUI() { context = ImGui::CreateContext(); }
+		~GUI();
 		void initGL(uint, uint);
 		/* use ImGui::GetIO() to set up mouse and keyboard inputs before calling this */
 		void begin();
 		void draw();
 		void sync();
 
-		void drawStats(uint);
-	};
+		//draws a window with stats
+		void drawStatsWindow(uint = 0);
+		//inserts the stats in an already existing window
+		void drawStats();
 
+		//sets the timeout for the syncinc process in ns. setting it too low at own perill. 
+		void setSyncTimeOut(uint _time) {
+			timeOutSync = _time;
+		}
+
+		uint getIdxCount() { return idx; }
+		uint getVertCount() { return vert; }
+		uint getSyncTime() { return syncTime; }
+		float getDrawTime() { return drawTime; }
+		float getMeanDrawTime() { return meanTime; }
+
+		ImGuiContext* getContext() { return context; }
+	};
 
 }

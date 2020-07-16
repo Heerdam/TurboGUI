@@ -1,6 +1,16 @@
 
 #include "../public/tb_gui.h"
 
+TurboGUI::GUI::~GUI() {
+    glDeleteVertexArrays(2, VAO);
+    glDeleteBuffers(2, VBO);
+    glDeleteBuffers(2, EBO);
+    glDeleteProgram(shader);
+    glDeleteTextures(1, &tex);
+    glDeleteSync(syncObj[0]);
+    glDeleteSync(syncObj[1]);
+}
+
 void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
  
     std::memset(drawTimeMean.data(), 0.f, drawTimeMean.size() * sizeof(float));
@@ -271,13 +281,15 @@ void TurboGUI::GUI::draw() {
 
 void TurboGUI::GUI::sync() {
     uint syncI = (currIndex + 1) % 2;
-    glClientWaitSync(syncObj[syncI], GL_SYNC_FLUSH_COMMANDS_BIT, 5e6);
+    auto t = std::chrono::high_resolution_clock::now();
+    glClientWaitSync(syncObj[syncI], GL_SYNC_FLUSH_COMMANDS_BIT, timeOutSync);
+    syncTime = (std::chrono::high_resolution_clock::now() - t).count();
     glDeleteSync(syncObj[syncI]);
     syncObj[currIndex] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     currIndex = syncI;
 }
 
-void TurboGUI::GUI::drawStats(uint _fps) {
+void TurboGUI::GUI::drawStatsWindow(uint _fps) {
     maxFps = std::max(maxFps, _fps);
     bool open = true;
 
@@ -286,13 +298,27 @@ void TurboGUI::GUI::drawStats(uint _fps) {
     ImGui::SetWindowFontScale(1.75f);
 
     //fps
-    ImGui::Text("fps: %i [%i]", _fps, maxFps);
+    if( _fps != 0)
+        ImGui::Text("fps: %i [%i]", _fps, maxFps);
     //draw time
-    ImGui::Text("draw time: %.3fms [%.3fms]", drawTime, meanTime);
+    ImGui::Text("time: %.3fms [%.3fms]", drawTime, meanTime);
     //vertices
-    ImGui::Text("v: %i [%i] [%i]", vert, maxVert, vertBound);
+    ImGui::Text("vert: %i [%i] [%i]", vert, maxVert, vertBound);
     //indices
-    ImGui::Text("i: %i [%i] [%i]", idx, maxIdx, idxBound);
-    
+    ImGui::Text("idx: %i [%i] [%i]", idx, maxIdx, idxBound);
+    //timeout
+    ImGui::Text("sync: %i [%i] [%i]", syncTime, timeOutSync, timeOutSync - syncTime);
+
     ImGui::End();
+}
+
+void TurboGUI::GUI::drawStats() {
+    //draw time
+    ImGui::Text("time: %.3fms [%.3fms]", drawTime, meanTime);
+    //vertices
+    ImGui::Text("vert: %i [%i] [%i]", vert, maxVert, vertBound);
+    //indices
+    ImGui::Text("idx: %i [%i] [%i]", idx, maxIdx, idxBound);
+    //timeout
+    ImGui::Text("sync: %i [%i] [%i]", syncTime, timeOutSync, timeOutSync - syncTime);
 }

@@ -189,7 +189,7 @@ int main() {
 		if (show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window);
 
-		gui.drawStats(fps);
+		gui.drawStatsWindow(fps);
 
 		gui.draw();
 		gui.sync();
@@ -198,6 +198,7 @@ int main() {
 
 		frame++;
 		if (ctime - time >= 1.0) {
+			
 			fps = frame;
 			frame = 0;
 			time = ctime;
