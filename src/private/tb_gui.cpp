@@ -13,7 +13,7 @@ TurboGUI::GUI::~GUI() {
 
 void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
  
-    std::memset(drawTimeMean.data(), 0.f, drawTimeMean.size() * sizeof(float));
+    std::memset(drawTimeMean.data(), 0, drawTimeMean.size() * sizeof(float));
 
     {
         ImGuiIO& io = ImGui::GetIO();
@@ -180,7 +180,7 @@ void TurboGUI::GUI::draw() {
         uint idx_offset = 0;
         uint v_offset = 0;
 
-        for (uint n = 0; n < draw_data->CmdListsCount; n++) {
+        for (int n = 0; n < draw_data->CmdListsCount; n++) {
             const ImDrawList* cmd_list = draw_data->CmdLists[n];
             std::memcpy(VBO_ptr[currIndex] + v_offset*5, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.Size * (uint)sizeof(ImDrawVert));
             std::memcpy(EBO_ptr[currIndex] + idx_offset, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.Size * (uint)sizeof(ImDrawIdx));
@@ -223,8 +223,8 @@ void TurboGUI::GUI::draw() {
         glUseProgram(shader);
         glBindVertexArray(VAO[currIndex]);
 
-        uint fb_width = draw_data->DisplaySize.x;
-        uint fb_height = draw_data->DisplaySize.y;
+        uint fb_width = static_cast<uint>(draw_data->DisplaySize.x);
+        uint fb_height = static_cast<uint>(draw_data->DisplaySize.y);
 
         glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
         const float L = draw_data->DisplayPos.x;
@@ -271,7 +271,7 @@ void TurboGUI::GUI::draw() {
     {
         auto deltaT = std::chrono::high_resolution_clock::now() - time;
         long long ns = deltaT.count();
-        drawTime = 1.f / 1e6 * ns;
+        drawTime = 1.f / static_cast<float>(1e6) * static_cast<float>(ns);
         drawMeanTimeIndex = (++drawMeanTimeIndex) % drawTimeMean.size();
         drawTimeMean[drawMeanTimeIndex] = drawTime;
         meanTime = std::accumulate(drawTimeMean.begin(), drawTimeMean.end(), 0.f);
@@ -283,7 +283,7 @@ void TurboGUI::GUI::sync() {
     uint syncI = (currIndex + 1) % 2;
     auto t = std::chrono::high_resolution_clock::now();
     glClientWaitSync(syncObj[syncI], GL_SYNC_FLUSH_COMMANDS_BIT, timeOutSync);
-    syncTime = (std::chrono::high_resolution_clock::now() - t).count();
+    syncTime = static_cast<uint>((std::chrono::high_resolution_clock::now() - t).count());
     glDeleteSync(syncObj[syncI]);
     syncObj[currIndex] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     currIndex = syncI;

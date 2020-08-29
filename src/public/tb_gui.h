@@ -37,7 +37,7 @@ namespace TurboGUI {
 		uint maxIdx = 0, maxVert = 0;
 		uint idx, vert;
 		uint maxFps = 0;
-		uint timeOutSync = 5e6;
+		uint timeOutSync = static_cast<uint>(5e6);
 		uint syncTime = 0;
 
 		ImGuiContext* context;
