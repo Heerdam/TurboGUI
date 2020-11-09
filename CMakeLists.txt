@@ -16,56 +16,52 @@ endif()
 
 include(FetchContent)
 
-SET(HEADER
-	src/public/imstb_truetype.h
-	src/public/imstb_textedit.h
-	src/public/imstb_rectpack.h
-	src/public/imgui_internal.h
-	src/public/imgui.h
-	src/public/imconfig.h
-	src/public/tb_gui.h
-	src/public/tb_defines.h
-)
-
 add_library(turbogui STATIC
-	"${HEADER}"
-	src/private/imgui.cpp
-	src/private/imgui_demo.cpp
-	src/private/imgui_draw.cpp
-	src/private/imgui_widgets.cpp
-	src/private/tb_gui.cpp
+	include/tb_gui.h
 )
 
-target_include_directories(turbogui PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/public)
+set_target_properties(turbogui PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(turbogui PROPERTIES VERSION 0.1)
 
+target_include_directories(turbogui PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/public)
+
 # ------------------ GLAD ------------------
+set(GLAD_API "gl=4.3" CACHE STRING "API type/version pairs, like \"gl=4.3,gles=\", no version means latest")
+set(GLAD_EXTENSIONS "GL_ARB_buffer_storage" CACHE STRING "Path to extensions file or comma separated list of extensions, if missing all extensions are included")
 find_package (glad 0.1.33 QUIET)
 if(glad_FOUND)
 	message(STATUS "GLAD found!")
 else()
 	message(STATUS "GLAD not found! Fetching...")
-	set(GLAD_API "gl=4.3" CACHE STRING "API type/version pairs, like \"gl=4.3,gles=\", no version means latest")
-	set(GLAD_EXTENSIONS "GL_ARB_buffer_storage" CACHE STRING "Path to extensions file or comma separated list of extensions, if missing all extensions are included")
 	FetchContent_Declare(
 		glad
 		GIT_REPOSITORY https://github.com/Dav1dde/glad.git
 		GIT_TAG        v0.1.33
 	)
-	FetchContent_GetProperties(glad)
-	if(NOT glad_POPULATED)
-		FetchContent_Populate(glad)
-		add_subdirectory("${glad_SOURCE_DIR}" "${glad_BINARY_DIR}")
-	endif()
+	FetchContent_MakeAvailable(glad)
+endif()
+
+# ------------------ IMGUI ------------------
+message(STATUS "Fetching imgui...")
+FetchContent_Declare(
+	imgui
+	GIT_REPOSITORY https://github.com/ocornut/imgui.git
+)
+if(NOT imgui_POPULATED)
+	FetchContent_Populate(imgui)
+	
+	target_include_directories(turbogui PUBLIC "${imgui_SOURCE_DIR}")
 endif()
 
 if (MSVC)
 	target_link_libraries(turbogui PUBLIC
 		glad
+		imgui
 	)
 else()
 	target_link_libraries(turbogui PUBLIC
 		glad
+		imgui
 		dl
 	)
 endif()
