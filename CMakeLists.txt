@@ -18,7 +18,7 @@ include(FetchContent)
 
 add_library( turbogui INTERFACE )
 
-target_include_directories(turbogui PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(turbogui INTERFACE "${CMAKE_CURRENT_LIST_DIR}/include")
 
 # ------------------ GLAD ------------------
 set(GLAD_API "gl=4.3" CACHE STRING "API type/version pairs, like \"gl=4.3,gles=\", no version means latest")
@@ -57,8 +57,8 @@ if(NOT imgui_POPULATED)
 	)
 
 	add_library(imgui "${IMGUI_FILES}")
-	
-	target_include_directories(turbogui PUBLIC "${imgui_SOURCE_DIR}")
+
+	target_include_directories(turbogui INTERFACE "${imgui_SOURCE_DIR}")
 endif()
 
 if (MSVC)
