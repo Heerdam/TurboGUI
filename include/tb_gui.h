@@ -17,6 +17,9 @@
 
 namespace TurboGUI {
 
+    typedef unsigned short ushort;
+    typedef unsigned int uint;
+
 	class TurboGuiException : public std::exception {
 		const std::string msg;
 	public:
@@ -382,7 +385,7 @@ void TurboGUI::GUI::drawStatsWindow(uint _fps) {
 
     //fps
     if( _fps != 0)
-        ImGui::Text("fps: %i [%i]", _fps, maxFps);
+    ImGui::Text("fps: %i [%i]", _fps, maxFps);
     //draw time
     ImGui::Text("time: %.3fms [%.3fms]", drawTime, meanTime);
     //vertices
