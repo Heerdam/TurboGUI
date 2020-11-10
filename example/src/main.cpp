@@ -1,9 +1,6 @@
-
-#include <GLFW/glfw3.h>
-
-#include <iostream>
-
 #include <tb_gui.h>
+#include <GLFW/glfw3.h>
+#include <iostream>
 
 void GLAPIENTRY MessageCallback(GLenum /*source*/, GLenum type, GLuint /*id*/, GLenum severity, GLsizei /*length*/, const GLchar* message, const void* /*userParam*/) {
 	if (type != GL_DEBUG_TYPE_ERROR) return;
