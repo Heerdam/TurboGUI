@@ -22,31 +22,6 @@ add_executable(tbgex
 
 set_target_properties(tbgex PROPERTIES LINKER_LANGUAGE CXX)
 
-# ------------------ IMGUI ------------------
-message(STATUS "Fetching imgui...")
-FetchContent_Declare(
-	imgui
-	GIT_REPOSITORY https://github.com/ocornut/imgui.git
-)
-FetchContent_GetProperties(imgui)
-
-if(NOT imgui_POPULATED)
-	FetchContent_Populate(imgui)
-
-	message(STATUS "Preparing imgui...")
-
-	set(IMGUI_FILES
-		"${imgui_SOURCE_DIR}/imgui_demo.cpp"
-		"${imgui_SOURCE_DIR}/imgui_draw.cpp"
-		"${imgui_SOURCE_DIR}/imgui_widgets.cpp"
-		"${imgui_SOURCE_DIR}/imgui.cpp"
-	)
-
-	add_library(imgui "${IMGUI_FILES}")
-	
-	target_include_directories(tbgex PUBLIC "${imgui_SOURCE_DIR}")
-endif()
-
 # ------------------ TURBOGUI ------------------
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/.." tbg)
 
@@ -72,7 +47,6 @@ else()
 endif()
 
 target_link_libraries(tbgex
-	imgui
 	glfw
 	turbogui
 )
