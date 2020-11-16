@@ -25,8 +25,22 @@ set_target_properties(tbgex PROPERTIES LINKER_LANGUAGE CXX)
 # ------------------ TURBOGUI ------------------
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/.." tbg)
 
+# ------------------ SPDLOG ------------------
+find_package (spdlog QUIET)
+if(spdlog_FOUND)
+	message(STATUS "SPDLOG found!")
+else()
+	message(STATUS "SPDLOG not found! Fetching...")
+	FetchContent_Declare(
+			spdlog
+			GIT_REPOSITORY https://github.com/gabime/spdlog
+	)
+	FetchContent_GetProperties(spdlog)
+	FetchContent_MakeAvailable(spdlog)
+endif() 
+
 # ------------------ GLFW ------------------
-find_package (glfw3 3.3.2 QUIET)
+find_package (glfw3 QUIET)
 if(glfw3_FOUND)
 	message(STATUS "GLFW found!")
 else()
@@ -49,5 +63,6 @@ endif()
 target_link_libraries(tbgex
 	glfw
 	turbogui
+	spdlog::spdlog
 )
 

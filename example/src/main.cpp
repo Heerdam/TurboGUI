@@ -101,7 +101,7 @@ int main() {
 	const float width = 1920.f;
 	const float height = 1080.f;
 
-	GLFWwindow* window = glfwCreateWindow(width, height, "TurboGUI Example 0.1a", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "TurboGUI Example 0.2a", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		return -1;
@@ -162,13 +162,18 @@ int main() {
 		io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
 		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
+		//TODO: turboplexer integration
 		glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
 		glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
 		glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
 		glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 	}
 
-	gui.initGL((unsigned int)(100000), (unsigned int)(200000));
+	try {
+		gui.initGL((unsigned int)(100000), (unsigned int)(200000));
+	} catch (const TurboGUI::TurboGuiException& e) {
+		std::cout << e.what() << std::endl;
+	}
 
 	bool show_demo_window = true;
 
