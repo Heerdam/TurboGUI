@@ -53,7 +53,8 @@ if(NOT imgui_POPULATED)
 		"${imgui_SOURCE_DIR}/imgui_demo.cpp"
 		"${imgui_SOURCE_DIR}/imgui_draw.cpp"
 		"${imgui_SOURCE_DIR}/imgui_widgets.cpp"
-		"${imgui_SOURCE_DIR}/imgui.cpp"
+		"${imgui_SOURCE_DIR}/imgui_tables.cpp"
+		"${imgui_SOURCE_DIR}/imgui.cpp"		
 	)
 
 	add_library(imgui "${IMGUI_FILES}")
