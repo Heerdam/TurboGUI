@@ -87,7 +87,7 @@ namespace TurboGUI {
 
 }
 
-TurboGUI::GUI::~GUI() {
+inline TurboGUI::GUI::~GUI() {
     glDeleteVertexArrays(2, VAO);
     glDeleteBuffers(2, VBO);
     glDeleteBuffers(2, EBO);
@@ -97,7 +97,7 @@ TurboGUI::GUI::~GUI() {
     glDeleteSync(syncObj[1]);
 }
 
-void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
+inline void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
  
     std::memset(drawTimeMean.data(), 0, drawTimeMean.size() * sizeof(float));
 
@@ -242,13 +242,13 @@ void TurboGUI::GUI::initGL(uint _vbo_upper_bound, uint _ebo_upper_bound) {
  
 }
 
-void TurboGUI::GUI::begin() {
+inline void TurboGUI::GUI::begin() {
     time = std::chrono::high_resolution_clock::now();
     ImGui::SetCurrentContext(context);
     ImGui::NewFrame();   
 }
 
-void TurboGUI::GUI::draw() {
+inline void TurboGUI::GUI::draw() {
 
     ImGui::Render();
 
@@ -365,7 +365,7 @@ void TurboGUI::GUI::draw() {
     }
 }
 
-void TurboGUI::GUI::sync() {
+inline void TurboGUI::GUI::sync() {
     uint syncI = (currIndex + 1) % 2;
     auto t = std::chrono::high_resolution_clock::now();
     glClientWaitSync(syncObj[syncI], GL_SYNC_FLUSH_COMMANDS_BIT, timeOutSync);
@@ -375,7 +375,7 @@ void TurboGUI::GUI::sync() {
     currIndex = syncI;
 }
 
-void TurboGUI::GUI::drawStatsWindow(uint _fps) {
+inline void TurboGUI::GUI::drawStatsWindow(uint _fps) {
     maxFps = std::max(maxFps, _fps);
     bool open = true;
 
@@ -398,7 +398,7 @@ void TurboGUI::GUI::drawStatsWindow(uint _fps) {
     ImGui::End();
 }
 
-void TurboGUI::GUI::drawStats() {
+inline void TurboGUI::GUI::drawStats() {
     //draw time
     ImGui::Text("time: %.3fms [%.3fms]", drawTime, meanTime);
     //vertices
